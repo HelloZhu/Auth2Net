@@ -88,6 +88,17 @@
 {
     NSLog(@"%s - %@ ;%ld", __func__, [request requestUrl],[ESDAPINetManager allTasks].count);
     
+    BOOL shouldStopHUD = YES;
+    if ([ESDAPINetManager allTasks].count){
+        for (ESDRequest *req in [ESDAPINetManager allTasks]) {
+            if ([req shouldShowProgress]) {
+                shouldStopHUD = NO;
+                break;
+            }
+        }
+    }
+    
+    
 }
 
 - (void)requestFail:(ESDRequest *)request response:(ESDAPIResponse *)response

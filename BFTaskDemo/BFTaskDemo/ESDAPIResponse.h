@@ -26,4 +26,8 @@ typedef void(^APIResponseFail)(ESDAPIResponse *apiResponse);
 @property (nonatomic, strong) NSError *error;
 @property (nonatomic, strong) NSDictionary *headerField;
 @property (nonatomic, strong) NSURLResponse *URLResponse;
+
++ (instancetype)successResponse:(id)respondObject httpStatusCode:(NSInteger)httpStatusCode ApiStatusCode:(NSInteger)ApiStatusCode msg:(NSString *)msg;
++ (instancetype)failResponse:(NSURLResponse *)URLResponse httpStatusCode:(NSInteger)httpStatusCode error:(NSError *)error msg:(NSString *)msg;
+
 @end

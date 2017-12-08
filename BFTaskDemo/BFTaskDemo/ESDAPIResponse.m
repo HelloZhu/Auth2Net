@@ -25,4 +25,24 @@
     return self;
 }
 
++ (instancetype)successResponse:(id)respondObject httpStatusCode:(NSInteger)httpStatusCode ApiStatusCode:(NSInteger)ApiStatusCode msg:(NSString *)msg
+{
+    ESDAPIResponse *response = [[ESDAPIResponse alloc] init];
+    response.respondObject = respondObject;
+    response.httpStatusCode = httpStatusCode;
+    response.ApiStatusCode = ApiStatusCode;
+    response.msg = msg;
+    return response;
+}
++ (instancetype)failResponse:(NSURLResponse *)URLResponse httpStatusCode:(NSInteger)httpStatusCode error:(NSError *)error msg:(NSString *)msg
+{
+    ESDAPIResponse *response = [[ESDAPIResponse alloc] init];
+    response.URLResponse = URLResponse;
+    response.httpStatusCode = httpStatusCode;
+    response.error = error;
+    response.msg = msg;
+    return response;
+}
+
+
 @end

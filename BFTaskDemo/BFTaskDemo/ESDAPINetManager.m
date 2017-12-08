@@ -200,7 +200,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
          localCredential:(AFOAuthCredential *)localCredential
 {
     NSHTTPURLResponse *response = (NSHTTPURLResponse*)httpResponse;
-    if(response.statusCode == 401) {
+    if(response.statusCode == 401 && ([requset needTokenType] != AuthTokenType_None)) {
         BFTaskCompletionSource *refreshTokenCS = [BFTaskCompletionSource taskCompletionSource];
         [[ESDAPINetManager sharedInstance] handleToken:refreshTokenCS fetchType:RefreshToken localCredential:localCredential];
         [[refreshTokenCS.task continueWithSuccessBlock:^id(BFTask *task) {
@@ -208,11 +208,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
             return nil;
         }] continueWithBlock:^id (BFTask *task) {
             if (task.error) {
-                ESDAPIResponse *fetchTokenFailResp = [[ESDAPIResponse alloc] init];
-                fetchTokenFailResp.error = error;
-                fetchTokenFailResp.httpStatusCode = error.code;
-                fetchTokenFailResp.msg = error.localizedFailureReason;
-                fetchTokenFailResp.URLResponse = response;
+                ESDAPIResponse *fetchTokenFailResp = [ESDAPIResponse failResponse:response httpStatusCode:error.code error:error msg:error.localizedFailureReason];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [ESDAPINetManager executeFailDelegate:requset response:fetchTokenFailResp];
                     if (failure) {
@@ -227,11 +223,8 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
         if (requset.retryCount >= 0) {
             [[ESDAPINetManager sharedInstance] taskWithRequest:requset progress:progress success:success failure:failure];
         }else{
-            ESDAPIResponse *apiFailResp = [[ESDAPIResponse alloc] init];
-            apiFailResp.error = error;
-            apiFailResp.httpStatusCode = response.statusCode;
-            apiFailResp.URLResponse = response;
-            apiFailResp.msg = error.localizedDescription;
+            
+            ESDAPIResponse *apiFailResp = [ESDAPIResponse failResponse:response httpStatusCode:response.statusCode error:error msg:error.localizedFailureReason];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [ESDAPINetManager executeFailDelegate:requset response:apiFailResp];
                 if (failure) {
