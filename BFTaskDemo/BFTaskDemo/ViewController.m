@@ -17,6 +17,7 @@
 #import "LoginRequest.h"
 #import "ESDOAuth2Manager.h"
 #import "DownloadRequest.h"
+#import "ESDLoginAPIProtocol.h"
 
 @interface ViewController ()<ESDAPINetManagerDelegate>
 @property (nonatomic, strong) AFHTTPSessionManager *manager;
@@ -49,21 +50,28 @@
         
     }];
     
-//    LoginRequest *loginRequest = [[LoginRequest alloc] init];
-//    [ESDOAuth2Manager fetchPWDTokenWithUserName:@"14458250055" pwd:@"9cbf8a4dcb8e30682b927f352d6559a0" success:^(AFOAuthCredential *credential) {
-//
-//        [[ESDAPINetManager sharedInstance] taskWithRequest:loginRequest progress:^(NSProgress *downloadProgress) {
-//
-//        } success:^(ESDAPIResponse *apiResponse) {
-//
-//        } failure:^(ESDAPIResponse *apiResponse) {
-//
-//        }];
-//
-//
-//    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-//
-//    }];
+    LoginRequest *loginRequest = [[LoginRequest alloc] init];
+    [ESDOAuth2Manager fetchPWDTokenWithUserName:@"14458250055" pwd:@"9cbf8a4dcb8e30682b927f352d6559a0" success:^(AFOAuthCredential *credential) {
+
+        [[ESDAPINetManager sharedInstance] taskWithRequest:loginRequest progress:^(NSProgress *downloadProgress) {
+
+        } success:^(ESDAPIResponse *apiResponse) {
+
+        } failure:^(ESDAPIResponse *apiResponse) {
+
+        }];
+        
+        
+    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+        
+    }];
+    
+    ESDRequest *testReq = [ESDRequest new];
+    if ([testReq conformsToProtocol:@protocol(ESDLoginAPIProtocol)]) {
+        id <ESDLoginAPIProtocol> req = testReq;
+        
+    }
+    
     
 //    DownloadRequest *downloadRequest = [[DownloadRequest alloc] init];
 //    [[ESDAPINetManager sharedInstance] taskWithRequest:downloadRequest progress:^(NSProgress *downloadProgress) {

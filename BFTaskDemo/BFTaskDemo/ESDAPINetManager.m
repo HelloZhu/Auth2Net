@@ -87,7 +87,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
                 fetchTokenType = RefreshToken;
             }
             BFTaskCompletionSource *fetchTokenCS = [BFTaskCompletionSource taskCompletionSource];
-            [manager handleToken:fetchTokenCS fetchType:fetchTokenType refreshToken:credential.refreshToken];
+            [manager handleToken:fetchTokenCS fetchType:fetchTokenType localCredential:credential];
             
             [[fetchTokenCS.task continueWithSuccessBlock:^id(BFTask *task) {
                 [[ESDAPINetManager sharedInstance] taskWithRequest:request progress:progress success:success failure:failure];
@@ -115,7 +115,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
         [ESDAPINetManager handleSuccessWithRequest:request response:response responseObject:responseObject success:success];
     } failure:^(NSURLResponse *response, NSError *error) {
         [self removeTask:request];
-        [ESDAPINetManager handleFailure:response error:error requset:request progress:progress success:success failure:failure refreshToken:credential.refreshToken];
+        [ESDAPINetManager handleFailure:response error:error requset:request progress:progress success:success failure:failure localCredential:credential];
     }];
     return task;
 }
@@ -197,12 +197,12 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
              progress:(APINetProgress)progress
               success:(APIResponseSuccess)success
               failure:(APIResponseFail)failure
-         refreshToken:(NSString *)refreshToken
+         localCredential:(AFOAuthCredential *)localCredential
 {
     NSHTTPURLResponse *response = (NSHTTPURLResponse*)httpResponse;
     if(response.statusCode == 401) {
         BFTaskCompletionSource *refreshTokenCS = [BFTaskCompletionSource taskCompletionSource];
-        [[ESDAPINetManager sharedInstance] handleToken:refreshTokenCS fetchType:RefreshToken refreshToken:refreshToken];
+        [[ESDAPINetManager sharedInstance] handleToken:refreshTokenCS fetchType:RefreshToken localCredential:localCredential];
         [[refreshTokenCS.task continueWithSuccessBlock:^id(BFTask *task) {
             [[ESDAPINetManager sharedInstance] taskWithRequest:requset progress:progress success:success failure:failure];
             return nil;
@@ -242,7 +242,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
     }
 }
 
-- (void)handleToken:(BFTaskCompletionSource *)cs fetchType:(FetchTokenType)type refreshToken:(NSString *)refreshToken
+- (void)handleToken:(BFTaskCompletionSource *)cs fetchType:(FetchTokenType)type localCredential:(AFOAuthCredential *)credential
 {
     if(self.tokenCS == nil || self.tokenCS.task.completed || self.tokenCS.task.cancelled) {
         self.tokenCS = [BFTaskCompletionSource taskCompletionSource];
@@ -253,12 +253,12 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
                 [self.tokenCS setError:error];
             }];
         }else if (type == RefreshToken) {
-            if (!refreshToken) {
+            if (!credential.refreshToken) {
                 NSError *refreshTokenError = [NSError errorWithDomain:NSCocoaErrorDomain code:-200 userInfo:@{NSLocalizedDescriptionKey:@"refreshToken is null"}];
                 [self.tokenCS setError:refreshTokenError];
                 return;
             }
-            [ESDOAuth2Manager refreshTokenWithRefreshToken:refreshToken success:^(AFOAuthCredential *credential) {
+            [ESDOAuth2Manager refreshTokenWithRefreshToken:credential.refreshToken success:^(AFOAuthCredential *credential) {
                 [self.tokenCS setResult:credential];
             } failure:^(NSURLSessionDataTask *task, NSError *error) {
                 [self.tokenCS setError:error];

@@ -103,7 +103,28 @@ const NSUInteger kRetryCount = 0;
             [ESDOAuth2Manager refreshTokenWithRefreshToken:refreshToken success:success failure:failure];
             return;
         }
-        NSError *cusError = [ESDOAuth2Manager failError:task error:error fetchType:@"fetchPWDToken"];
+        NSError *cusError = [ESDOAuth2Manager failError:task error:error fetchType:@"refreshToken"];
+        if (failure) {
+            failure(task, cusError);
+        }
+    }];
+}
+
++ (void)refreshTokenWithLocalCredential:(AFOAuthCredential *)localCredential success:(OAuth2Success)success failure:(OAuth2Fail)failure
+{
+    NSString *URLString = [ESDOAuth2Manager sharedInstance].URLString;
+    [[ESDOAuth2Manager sharedInstance].manager authenticateUsingOAuthWithURLString:URLString refreshToken:localCredential.refreshToken success:^(AFOAuthCredential * _Nonnull credential) {
+        [AFOAuthCredential storeCredential:credential withIdentifier:credential.tokenType];
+        [ESDOAuth2Manager sharedInstance].retryCount = kRetryCount;
+        if (success) {success(credential);}
+    } failure:^(NSURLSessionDataTask * _Nonnull task, NSError * _Nonnull error) {
+        [ESDOAuth2Manager sharedInstance].retryCount--;
+        if ([ESDOAuth2Manager sharedInstance].retryCount >= 0) {
+            [ESDOAuth2Manager refreshTokenWithRefreshToken:localCredential.refreshToken success:success failure:failure];
+            return;
+        }
+        [AFOAuthCredential deleteCredentialWithIdentifier:localCredential.tokenType];
+        NSError *cusError = [ESDOAuth2Manager failError:task error:error fetchType:@"refreshToken"];
         if (failure) {
             failure(task, cusError);
         }
