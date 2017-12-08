@@ -163,24 +163,19 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
 + (void)handleSuccessWithRequest:(ESDRequest *)request response:(NSURLResponse *)response responseObject:(id)responseObject success:(APIResponseSuccess)success
 {
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse*)response;
-    ESDAPIResponse *apiResponse = [[ESDAPIResponse alloc] init];
-   
     NSInteger code = 0;
     NSString *msg = nil;
-    NSDictionary *data = nil;
+    id data = nil;
     if ([responseObject isKindOfClass:[NSDictionary class]]){
         NSDictionary *responeDic = (NSDictionary *)responseObject;
         code = [[responeDic objectForKey:@"ResponseStatus"] integerValue];
         msg = [responeDic objectForKey:@"ResponseDetails"];
         data = [responeDic objectForKey:@"ResponseData"];
-        apiResponse.respondObject = data;
     }else{
-         apiResponse.respondObject = responseObject;
+        data = responseObject;
     }
-    apiResponse.ApiStatusCode = code;
-    apiResponse.msg = msg;
-    apiResponse.httpStatusCode = httpResponse.statusCode;
-    apiResponse.headerField = httpResponse.allHeaderFields;
+    
+    ESDAPIResponse *apiResponse = [ESDAPIResponse successResponse:data httpStatusCode:httpResponse.statusCode ApiStatusCode:code msg:msg];
     apiResponse.URLResponse = response;
     
     dispatch_async(dispatch_get_main_queue(), ^{
