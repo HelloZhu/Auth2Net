@@ -66,11 +66,7 @@
         
     }];
     
-    ESDRequest *testReq = [ESDRequest new];
-    if ([testReq conformsToProtocol:@protocol(ESDLoginAPIProtocol)]) {
-        id <ESDLoginAPIProtocol> req = testReq;
-        
-    }
+   
     
     
 //    DownloadRequest *downloadRequest = [[DownloadRequest alloc] init];

@@ -258,7 +258,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
                 [self.tokenCS setError:refreshTokenError];
                 return;
             }
-            [ESDOAuth2Manager refreshTokenWithRefreshToken:credential.refreshToken success:^(AFOAuthCredential *credential) {
+            [ESDOAuth2Manager refreshTokenWithLocalCredential:credential success:^(AFOAuthCredential *credential) {
                 [self.tokenCS setResult:credential];
             } failure:^(NSURLSessionDataTask *task, NSError *error) {
                 [self.tokenCS setError:error];
