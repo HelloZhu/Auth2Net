@@ -14,6 +14,8 @@
 #import "ESDOAuth2Manager.h"
 #import "ESDLoginAPIProtocol.h"
 
+#define ESD_BLOCK_SAFE_RUN(block, ...)    block ? block(__VA_ARGS__) : nil;
+
 typedef NS_ENUM(NSInteger, FetchTokenType) {
     FetchClientToken = 0,
     FetchPWDToken,
@@ -48,9 +50,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
             ESDAPIResponse *resp = [[ESDAPIResponse alloc] init];
             resp.msg = @"Network Error";
             [ESDAPINetManager executeFailDelegate:request response:resp];
-            if (failure) {
-                failure(resp);
-            }
+            ESD_BLOCK_SAFE_RUN(failure, resp);
         });
         return nil;
     }
@@ -73,9 +73,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
                     ESDAPIResponse *resp = [[ESDAPIResponse alloc] init];
                     resp.msg = @"Not Contain password oauth info";
                     [ESDAPINetManager executeFailDelegate:request response:resp];
-                    if (failure) {
-                        failure(resp);
-                    }
+                    ESD_BLOCK_SAFE_RUN(failure, resp);
                 });
                 return nil;
             }
@@ -99,9 +97,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
                     fetchTokenFailResp.error = task.error;
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [ESDAPINetManager executeFailDelegate:request response:fetchTokenFailResp];
-                        if (failure) {
-                            failure(fetchTokenFailResp);
-                        }
+                        ESD_BLOCK_SAFE_RUN(failure, fetchTokenFailResp);
                     });
                 }
                 return nil;
@@ -180,9 +176,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [ESDAPINetManager executeSuccessDelegate:request response:apiResponse];
-        if (success){
-            success(apiResponse);
-        }
+        ESD_BLOCK_SAFE_RUN(success, apiResponse);
     });
 }
 
@@ -206,9 +200,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
                 ESDAPIResponse *fetchTokenFailResp = [ESDAPIResponse failResponse:response httpStatusCode:error.code error:error msg:error.localizedFailureReason];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [ESDAPINetManager executeFailDelegate:requset response:fetchTokenFailResp];
-                    if (failure) {
-                        failure(fetchTokenFailResp);
-                    }
+                    ESD_BLOCK_SAFE_RUN(failure, fetchTokenFailResp);
                 });
             }
             return nil;
@@ -222,9 +214,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
             ESDAPIResponse *apiFailResp = [ESDAPIResponse failResponse:response httpStatusCode:response.statusCode error:error msg:error.localizedFailureReason];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [ESDAPINetManager executeFailDelegate:requset response:apiFailResp];
-                if (failure) {
-                    failure(apiFailResp);
-                }
+                ESD_BLOCK_SAFE_RUN(failure, apiFailResp);
             });
         }
     }
