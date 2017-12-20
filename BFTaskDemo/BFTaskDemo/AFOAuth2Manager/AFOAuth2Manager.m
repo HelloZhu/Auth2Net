@@ -78,18 +78,47 @@ static NSError * AFErrorFromRFC6749Section5_2Error(id object) {
 
 @implementation AFOAuth2Manager
 
-+ (instancetype)managerWithclientID:(NSString *)clientID
++ (instancetype) managerWithBaseURL:(NSURL *)url
+                           clientID:(NSString *)clientID
                              secret:(NSString *)secret {
-    
-    AFOAuth2Manager *manager = [AFOAuth2Manager manager];
-    manager.clientID = clientID;
-    manager.secret = secret;
-    manager.useHTTPBasicAuthentication = YES;
-    [manager.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
-    
-    return manager;
+    return [self managerWithBaseURL:url sessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] clientID:clientID secret:secret];
 }
 
++ (instancetype) managerWithBaseURL:(NSURL *)url
+               sessionConfiguration:(NSURLSessionConfiguration *)configuration
+                           clientID:(NSString *)clientID
+                             secret:(NSString *)secret {
+    return [[self alloc] initWithBaseURL:url sessionConfiguration:configuration clientID:clientID secret:secret];
+}
+
+- (id)initWithBaseURL:(NSURL *)url
+             clientID:(NSString *)clientID
+               secret:(NSString *)secret {
+    return [self initWithBaseURL:url sessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] clientID:clientID secret:secret];
+}
+
+- (id)initWithBaseURL:(NSURL *)url
+ sessionConfiguration:(NSURLSessionConfiguration *)configuration
+             clientID:(NSString *)clientID
+               secret:(NSString *)secret {
+    NSParameterAssert(url);
+    NSParameterAssert(clientID);
+    NSParameterAssert(secret);
+
+    self = [super initWithBaseURL:url sessionConfiguration:configuration];
+    if (!self) {
+        return nil;
+    }
+
+    self.serviceProviderIdentifier = [self.baseURL host];
+    self.clientID = clientID;
+    self.secret = secret;
+    self.useHTTPBasicAuthentication = YES;
+
+    [self.requestSerializer setValue:@"application/json" forHTTPHeaderField:@"Accept"];
+
+    return self;
+}
 
 #pragma mark -
 
@@ -166,6 +195,24 @@ static NSError * AFErrorFromRFC6749Section5_2Error(id object) {
 }
 
 - (NSURLSessionTask *)authenticateUsingOAuthWithURLString:(NSString *)URLString
+                                                     code:(NSString *)code
+                                              redirectURI:(NSString *)uri
+                                                  success:(void (^)(AFOAuthCredential *credential))success
+                                                  failure:(void (^)(NSURLSessionDataTask *task ,NSError *error))failure
+{
+    NSParameterAssert(code);
+    NSParameterAssert(uri);
+
+    NSDictionary *parameters = @{
+                                 @"grant_type": kAFOAuthCodeGrantType,
+                                 @"code": code,
+                                 @"redirect_uri": uri
+                                 };
+
+    return [self authenticateUsingOAuthWithURLString:URLString parameters:parameters success:success failure:failure];
+}
+
+- (NSURLSessionTask *)authenticateUsingOAuthWithURLString:(NSString *)URLString
                                                parameters:(NSDictionary *)parameters
                                                   success:(void (^)(AFOAuthCredential *credential))success
                                                   failure:(void (^)(NSURLSessionDataTask *task ,NSError *error))failure
@@ -176,7 +223,7 @@ static NSError * AFErrorFromRFC6749Section5_2Error(id object) {
         mutableParameters[@"client_secret"] = self.secret;
     }
     parameters = [NSDictionary dictionaryWithDictionary:mutableParameters];
-
+    
     NSURLSessionTask *task;
     task = [self POST:URLString parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         if (!responseObject) {
@@ -185,19 +232,19 @@ static NSError * AFErrorFromRFC6749Section5_2Error(id object) {
             }
             return;
         }
-
+        
         if ([responseObject valueForKey:@"error"]) {
             if (failure) {
                 failure(task,AFErrorFromRFC6749Section5_2Error(responseObject));
             }
             return;
         }
-
+        
         NSString *refreshToken = [responseObject valueForKey:@"refresh_token"];
         if (!refreshToken || [refreshToken isEqual:[NSNull null]]) {
             refreshToken = [parameters valueForKey:@"refresh_token"];
         }
-
+        
         //NSString *token_type = [responseObject valueForKey:@"token_type"];
         
         NSDictionary *respDict = (NSDictionary *)responseObject;
@@ -209,32 +256,32 @@ static NSError * AFErrorFromRFC6749Section5_2Error(id object) {
         }
         
         AFOAuthCredential *credential = [AFOAuthCredential credentialWithOAuthToken:[responseObject valueForKey:@"access_token"] tokenType:token_type];
-
+        
         if (refreshToken) { // refreshToken is optional in the OAuth2 spec
             [credential setRefreshToken:refreshToken];
         }
-
+        
         // Expiration is optional, but recommended in the OAuth2 spec. It not provide, assume distantFuture === never expires
         NSDate *expireDate = [NSDate distantFuture];
         id expiresIn = [responseObject valueForKey:@"expires_in"];
         if (expiresIn && ![expiresIn isEqual:[NSNull null]]) {
             expireDate = [NSDate dateWithTimeIntervalSinceNow:[expiresIn doubleValue]];
         }
-
+        
         if (expireDate) {
             [credential setExpiration:expireDate];
         }
-
+        
         if (success) {
             success(credential);
         }
-
+        
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         if (failure) {
             failure(task,error);
         }
     }];
-
+    
     return task;
 }
 

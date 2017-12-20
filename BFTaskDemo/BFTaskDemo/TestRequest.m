@@ -12,17 +12,22 @@
 
 - (NSString *)baseUrl
 {
-    return @"";
+    return @"https://api.anhewang.com";
 }
 
 - (NSString *)requestUrl
 {
-    return @"";
+    return @"/OAuth/Token";
 }
 
 - (ESDRequestMethod)requestMethod
 {
-    return ESDRequestMethodGet;
+    return ESDRequestMethodPost;
+}
+
+- (AuthTokenType)needTokenType
+{
+    return AuthTokenType_None;
 }
 
 

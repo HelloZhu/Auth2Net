@@ -23,7 +23,7 @@
 #import <Foundation/Foundation.h>
 #import "AFOAuthCredential.h"
 #import "AFHTTPRequestSerializer+OAuth2.h"
-#import "AFHTTPSessionManager.h"
+#import "AFNetworking.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,14 +55,38 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Creates and initializes an `AFOAuth2Manager` object with the specified base URL, client identifier, and secret.
 
+ @param url The base URL for the HTTP client. This argument must not be `nil`.
  @param clientID The client identifier issued by the authorization server, uniquely representing the registration information provided by the client. This argument must not be `nil`.
  @param secret The client secret.
 
  @return The newly-initialized OAuth 2 manager
  */
-+ (instancetype)managerWithclientID:(NSString *)clientID
++ (instancetype)managerWithBaseURL:(NSURL *)url
+                          clientID:(NSString *)clientID
                             secret:(NSString *)secret;
 
++ (instancetype)managerWithBaseURL:(NSURL *)url
+              sessionConfiguration:(nullable NSURLSessionConfiguration *)configuration
+                          clientID:(NSString *)clientID
+                            secret:(NSString *)secret;
+
+/**
+ Initializes an `AFOAuth2Manager` object with the specified base URL, client identifier, and secret. The communication to to the server will use HTTP basic auth by default (use `-(id)initWithBaseURL:clientID:secret:withBasicAuth:` to change this).
+
+ @param url The base URL for the HTTP manager. This argument must not be `nil`.
+ @param clientID The client identifier issued by the authorization server, uniquely representing the registration information provided by the client. This argument must not be `nil`.
+ @param secret The client secret.
+
+ @return The newly-initialized OAuth 2 client
+ */
+- (id)initWithBaseURL:(NSURL *)url
+             clientID:(NSString *)clientID
+               secret:(NSString *)secret;
+
+- (id)initWithBaseURL:(NSURL *)url
+ sessionConfiguration:(nullable NSURLSessionConfiguration *)configuration
+             clientID:(NSString *)clientID
+               secret:(NSString *)secret;
 
 ///---------------------
 /// @name Authenticating
@@ -107,6 +131,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSURLSessionTask *)authenticateUsingOAuthWithURLString:(NSString *)URLString
                                              refreshToken:(NSString *)refreshToken
+                                                  success:(void (^)(AFOAuthCredential *credential))success
+                                                  failure:(void (^)(NSURLSessionDataTask *task ,NSError *error))failure;
+
+/**
+ Creates and enqueues an `NSURLSessionTask` to authenticate against the server with an authorization code, redirecting to a specified URI upon successful authentication.
+ @param URLString The URL string used to create the request URL.
+ @param code The authorization code
+ @param uri The URI to redirect to after successful authentication
+ @param success A block object to be executed when the request operation finishes successfully. This block has no return value and takes a single argument: the OAuth credential returned by the server.
+ @param failure A block object to be executed when the request operation finishes unsuccessfully, or that finishes successfully, but encountered an error while parsing the response data. This block has no return value and takes a single argument: the error returned from the server.
+ */
+- (NSURLSessionTask *)authenticateUsingOAuthWithURLString:(NSString *)URLString
+                                                     code:(NSString *)code
+                                              redirectURI:(NSString *)uri
                                                   success:(void (^)(AFOAuthCredential *credential))success
                                                   failure:(void (^)(NSURLSessionDataTask *task ,NSError *error))failure;
 

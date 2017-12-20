@@ -17,11 +17,13 @@ const NSUInteger kRefreshTokenRetryCount = 0;
 
 @interface ESDOAuth2Manager ()
 @property (nonatomic, strong) AFOAuth2Manager *manager;
+@property (nonatomic, copy) NSString *baseURLString;
 @property (nonatomic, copy) NSString *URLString;
 @property (nonatomic, assign) NSInteger retryCount;
 @property (nonatomic, assign) NSInteger fetchClientTokenRetryCount;
 @property (nonatomic, assign) NSInteger fetchPWDTokenRetryCount;
 @property (nonatomic, assign) NSInteger refreshTokenRetryCount;
+
 @end
 
 
@@ -48,10 +50,20 @@ const NSUInteger kRefreshTokenRetryCount = 0;
     return manager;
 }
 
++ (void)setBaseURL:(NSString *)baseURL
+{
+    [ESDOAuth2Manager sharedInstance].baseURLString = baseURL;
+}
+
++ (void)setURLString:(NSString *)urlString
+{
+    [ESDOAuth2Manager sharedInstance].URLString = urlString;
+}
+
 - (AFOAuth2Manager *)manager
 {
     if (!_manager) {
-        _manager = [AFOAuth2Manager managerWithclientID:kClientID secret:kSecret];
+        _manager = [AFOAuth2Manager managerWithBaseURL:[NSURL URLWithString:self.baseURLString] clientID:kClientID secret:kSecret];
         _manager.useHTTPBasicAuthentication = NO;
     }
     return _manager;
@@ -131,10 +143,7 @@ const NSUInteger kRefreshTokenRetryCount = 0;
     return ownError;
 }
 
-+ (void)setTokenURLString:(NSString *)urlString
-{
-    [ESDOAuth2Manager sharedInstance].URLString = urlString;
-}
+
 
 
 

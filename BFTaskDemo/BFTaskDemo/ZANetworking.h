@@ -24,7 +24,7 @@ typedef NS_ENUM(NSUInteger, ZARequestType) {
 
 typedef void(^ZANetworkSuccess)(NSURLResponse *response, id  responseObject);
 typedef void(^ZANetworkFailure)(NSURLResponse *response, NSError *error);
-typedef void(^ZANetworkProgress)(NSProgress *downloadProgress);
+typedef void(^ZANetworkProgress)(NSProgress *progress);
 
 @interface ZANetworking : NSObject
 

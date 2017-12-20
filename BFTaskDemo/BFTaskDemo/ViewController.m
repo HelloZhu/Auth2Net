@@ -32,39 +32,41 @@
     self.manager = [AFHTTPSessionManager manager];
     
     
-    
 }
 - (IBAction)testNet:(id)sender {
+    
+    
+    
     
 //    NSString *path = @"http://temp1.api.zac-esd.zhongan.com.cn/api/Service/HomePageConfig?platform=Ios";
     
     TestRequest *request = [[TestRequest alloc] init];
     request.retryCount = 0;
     request.delegate = self;
-    
+
     [[ESDAPINetManager sharedInstance] taskWithRequest:request progress:^(NSProgress *downloadProgress) {
-        
+
     } success:^(ESDAPIResponse *apiResponse) {
-        
+
     } failure:^(ESDAPIResponse *apiResponse) {
-        
+
     }];
-    
-    LoginRequest *loginRequest = [[LoginRequest alloc] init];
-    [ESDOAuth2Manager fetchPWDTokenWithUserName:@"14458250055" pwd:@"9cbf8a4dcb8e30682b927f352d6559a0" success:^(AFOAuthCredential *credential) {
-
-        [[ESDAPINetManager sharedInstance] taskWithRequest:loginRequest progress:^(NSProgress *downloadProgress) {
-
-        } success:^(ESDAPIResponse *apiResponse) {
-
-        } failure:^(ESDAPIResponse *apiResponse) {
-
-        }];
-        
-        
-    } failure:^(NSURLSessionDataTask *task, NSError *error) {
-        
-    }];
+//
+//    LoginRequest *loginRequest = [[LoginRequest alloc] init];
+//    [ESDOAuth2Manager fetchPWDTokenWithUserName:@"14458250055" pwd:@"9cbf8a4dcb8e30682b927f352d6559a0" success:^(AFOAuthCredential *credential) {
+//
+//        [[ESDAPINetManager sharedInstance] taskWithRequest:loginRequest progress:^(NSProgress *downloadProgress) {
+//
+//        } success:^(ESDAPIResponse *apiResponse) {
+//
+//        } failure:^(ESDAPIResponse *apiResponse) {
+//
+//        }];
+//
+//
+//    } failure:^(NSURLSessionDataTask *task, NSError *error) {
+//
+//    }];
     
    
     

@@ -15,7 +15,8 @@ typedef void(^OAuth2Fail)(NSURLSessionDataTask *task ,NSError *error);
 
 + (instancetype)sharedInstance;
 
-+ (void)setTokenURLString:(NSString *)urlString;
++ (void)setBaseURL:(NSString *)baseURL;
++ (void)setURLString:(NSString *)urlString;
 
 + (void)fetchClientTokenWithSuccess:(OAuth2Success)success failure:(OAuth2Fail)failure;
 + (void)fetchPWDTokenWithUserName:(NSString *)username pwd:(NSString *)pwd success:(OAuth2Success)success failure:(OAuth2Fail)failure;
