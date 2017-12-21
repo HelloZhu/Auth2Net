@@ -43,6 +43,7 @@ typedef NS_ENUM(NSInteger , AuthTokenType){
 - (NSDictionary *)requestArgument;
 - (AuthTokenType)needTokenType;
 - (BOOL)shouldCancelExecutingSameRequest;
+- (BOOL)shouldContinueIfHasExecutingSameRequest;
 //需上传的文件的信息
 - (ESDFileConfig *)uploadFileINFO;
 - (NSArray *)uploadfilePaths;

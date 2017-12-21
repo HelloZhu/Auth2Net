@@ -102,7 +102,10 @@
     return YES;
 }
 
-
+- (BOOL)shouldContinueIfHasExecutingSameRequest
+{
+    return NO;
+}
 - (NSString *)progressHUDText
 {
     return @"";

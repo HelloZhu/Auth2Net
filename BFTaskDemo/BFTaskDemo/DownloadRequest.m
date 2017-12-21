@@ -7,8 +7,16 @@
 //
 
 #import "DownloadRequest.h"
+#import "ESDAPINetManager.h"
+
+@interface DownloadRequest ()
+
+
+
+@end
 
 @implementation DownloadRequest
+
 - (NSString *)baseUrl
 {
     return @"https://videodownloader.ummy.net";
@@ -31,8 +39,24 @@
 
 - (NSString *)downloadFileTargetPath
 {
+    
     return [NSHomeDirectory() stringByAppendingString:@"/Documents/test.dmg"];
 }
 
++ (void)downloadWithRequest:(DownloadRequest *)request success:(void(^)(NSArray *results))success failure:(void(^)(ESDAPIResponse *apiResponse))failure
+{
+    NSArray *localPaths = nil;
+    NSArray *shouldDownloadfileIDs = nil;
+    
+    [[ESDAPINetManager sharedInstance] taskWithRequest:request progress:nil success:^(ESDAPIResponse *apiResponse) {
+        
+        NSString *path = apiResponse.respondObject;
+//        [[path unzip] to dir];
+        NSMutableArray *newpaths = nil;
+        [newpaths addObjectsFromArray:localPaths];
+        success(newpaths);
+        
+    } failure:failure];
+}
 
 @end

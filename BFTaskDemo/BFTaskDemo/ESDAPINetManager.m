@@ -42,6 +42,12 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
 
 - (NSURLSessionTask *)taskWithRequest:(ESDRequest *)request progress:(APINetProgress)progress success:(APIResponseSuccess)success failure:(APIResponseFail)failure
 {
+    if (![request shouldContinueIfHasExecutingSameRequest]) {
+        if ([ESDAPINetManager taskContainRequest:request]) {
+            return nil;
+        }
+    }
+    
     [ESDAPINetManager executeWillStartDelegate:request];
     [self saveTask:request];
     if ([ZANetworking networkReachabilityStatus] == AFNetworkReachabilityStatusUnknown) {
@@ -261,6 +267,27 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
     NSString *URLString = [request requestUrl];
     URLString = [NSString stringWithFormat:@"%@%@",baseURLString, URLString];
     [ZANetworking cancelTaskWithURL:URLString parameters:parameters];
+}
+
++ (BOOL)taskContainRequest:(ESDRequest *)request
+{
+    NSString *taskID = [ESDAPINetManager requestID:request];
+    for (ESDRequest *req in [ESDAPINetManager allTasks]) {
+        NSString *reqID = [ESDAPINetManager requestID:req];
+        if ([reqID isEqualToString:taskID]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
++ (NSString *)requestID:(ESDRequest *)request
+{
+    NSDictionary *parameters = [request requestArgument];
+    NSString *baseURLString = [request baseUrl];
+    NSString *URLString = [request requestUrl];
+    URLString = [NSString stringWithFormat:@"%@%@",baseURLString, URLString];
+    return [ZANetworking taskID:URLString params:parameters];
 }
 
 + (void)executeWillStartDelegate:(ESDRequest *)request

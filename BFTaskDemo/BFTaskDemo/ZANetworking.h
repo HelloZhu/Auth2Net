@@ -62,4 +62,5 @@ typedef void(^ZANetworkProgress)(NSProgress *progress);
 + (void)cancelTaskWithURL:(NSString *)URLString parameters:(NSDictionary *)parameters;
 + (void)detectNet:(void(^)(AFNetworkReachabilityStatus status))statusChangeBlock;
 + (AFNetworkReachabilityStatus)networkReachabilityStatus;
++ (NSString *)taskID:(NSString *)url params:(NSDictionary *)params;
 @end

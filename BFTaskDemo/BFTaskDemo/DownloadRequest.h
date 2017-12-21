@@ -9,5 +9,5 @@
 #import "ESDRequest.h"
 
 @interface DownloadRequest : ESDRequest
-
+@property (nonatomic, strong) NSArray *downloadFileIDs;
 @end
