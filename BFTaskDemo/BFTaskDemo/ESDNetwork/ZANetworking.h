@@ -59,6 +59,17 @@ typedef void(^ZANetworkProgress)(NSProgress *progress);
                                   success:(ZANetworkSuccess)success
                                      fail:(ZANetworkFailure)failure;
 
++ (NSURLSessionTask *)uploadWithURLString:(NSString *)URLString
+                               parameters:(NSDictionary *)parameters
+                                 fileData:(NSData *)fileData
+                                 filename:(NSString *)fileName
+                                     name:(NSString *)name
+                                 mimeType:(NSString *)mimeType
+                                 progress:(ZANetworkProgress)progress
+                                  success:(ZANetworkSuccess)success
+                                     fail:(ZANetworkFailure)failure;
+
+
 + (void)cancelTaskWithURL:(NSString *)URLString parameters:(NSDictionary *)parameters;
 + (void)detectNet:(void(^)(AFNetworkReachabilityStatus status))statusChangeBlock;
 + (AFNetworkReachabilityStatus)networkReachabilityStatus;

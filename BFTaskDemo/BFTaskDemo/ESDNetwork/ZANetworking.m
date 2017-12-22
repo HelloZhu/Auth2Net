@@ -224,6 +224,35 @@
     return task;
 }
 
++ (NSURLSessionTask *)uploadWithURLString:(NSString *)URLString
+                               parameters:(NSDictionary *)parameters
+                                 fileData:(NSData *)fileData
+                                 filename:(NSString *)fileName
+                                     name:(NSString *)name
+                                 mimeType:(NSString *)mimeType
+                                 progress:(ZANetworkProgress)progress
+                                  success:(ZANetworkSuccess)success
+                                     fail:(ZANetworkFailure)failure
+{
+    NSString *taskID = [ZANetworking taskID:URLString params:parameters];
+    ZAHttpSessionManager *manager = [[ZANetworking shareInstance] manager];
+    NSURLSessionTask *task = [manager POST:URLString parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        [formData appendPartWithFileData:fileData name:name fileName:fileName mimeType:mimeType];
+    } progress:progress success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+        if (success) {
+            success(task.response,responseObject);
+        }
+        [ZANetworking removeTaskWithID:taskID];
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        if (failure) {
+            failure(task.response, error);
+        }
+        [ZANetworking removeTaskWithID:taskID];
+    }];
+    [task resume];
+    return task;
+}
+
 + (void)cancelTaskWithURL:(NSString *)URLString parameters:(NSDictionary *)parameters
 {
     if ([ZANetworking isNullString:URLString]){return;}

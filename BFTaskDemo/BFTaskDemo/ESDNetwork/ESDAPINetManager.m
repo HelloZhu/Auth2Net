@@ -153,7 +153,12 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
         task = [ZANetworking POST:URLString parameters:parameters progress:progress success:success failure:failure];
     }else if (method == ESDRequestMethodUploadFile){
         ESDFileConfig *fileINF = [request uploadFileINFO];
-        task = [ZANetworking uploadWithURLString:URLString parameters:parameters filePath:fileINF.filePath filename:fileINF.fileName name:fileINF.name mimeType:fileINF.mimeType progress:progress success:success fail:failure];
+        if (fileINF.filePath) {
+             task = [ZANetworking uploadWithURLString:URLString parameters:parameters filePath:fileINF.filePath filename:fileINF.fileName name:fileINF.name mimeType:fileINF.mimeType progress:progress success:success fail:failure];
+        }else{
+            task = [ZANetworking uploadWithURLString:URLString parameters:parameters fileData:fileINF.fileData filename:fileINF.fileName name:fileINF.name mimeType:fileINF.mimeType progress:progress success:success fail:failure];
+        }
+       
     }else if (method == ESDRequestMethodDownloadFile){
         NSString *targetPath = [request downloadFileTargetPath];
         task = [ZANetworking downloadWithURLString:URLString parameters:parameters targetPath:targetPath progress:progress success:success failure:failure];
@@ -333,5 +338,13 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
 {
     return [ESDAPINetManager sharedInstance].taskRequestArr;
 }
+
++ (BOOL)isValidUrl:(NSString *)urlString
+{
+    NSString *regex =@"[a-zA-z]+://[^\\s]*";
+    NSPredicate *urlTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@",regex];
+    return [urlTest evaluateWithObject:urlString];
+}
+
 
 @end

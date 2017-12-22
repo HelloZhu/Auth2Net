@@ -10,7 +10,6 @@
 #import "BFTask.h"
 #import "BFTaskCompletionSource.h"
 #import "AFNetworking.h"
-#import "DCFHttpManager.h"
 #import "AFOAuth2Manager.h"
 #import "ESDAPINetManager.h"
 #import "TestRequest.h"
@@ -108,41 +107,6 @@
     NSLog(@"%s - %@ ;%ld", __func__, [request requestUrl],[ESDAPINetManager allTasks].count);
 }
 
-- (void)test
-{
-    BFTaskCompletionSource *refreshTokenCS = [BFTaskCompletionSource taskCompletionSource];
-    
-    
-    [[refreshTokenCS.task continueWithSuccessBlock:^id(BFTask *task) {
-        
-        
-        
-        return nil;
-        
-    }] continueWithBlock:^id (BFTask *task) {
-        
-        if (task.error) {
-           
-        }
-        return nil;
-    }];
-}
 
-- (BFTask *)executeEndPointAsync :(NSString *)url parameters:(id)parameters {
-    BFTaskCompletionSource *BFTask = [BFTaskCompletionSource taskCompletionSource];
-    
-    AFHTTPResponseSerializer *responseSerializer = [AFJSONResponseSerializer serializer];
-    self.manager.responseSerializer = responseSerializer;
-    
-    [self.manager GET:url parameters:parameters progress:^(NSProgress * _Nonnull downloadProgress) {
-    } success:^(NSURLSessionDataTask * _Nonnull task, id _Nullable responseObject) {
-        //do something, save response
-        [BFTask setResult:responseObject];
-    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [BFTask setError:error];
-    }];
-    
-    return BFTask.task;
-}
 
 @end
