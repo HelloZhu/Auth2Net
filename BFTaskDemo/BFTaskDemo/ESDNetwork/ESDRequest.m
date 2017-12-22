@@ -69,10 +69,6 @@
     return AuthTokenType_Client;
 }
 
-- (NSArray *)uploadfilePaths
-{
-    return @[];
-}
 
 /**下载文件配置*/
 /**下载文件所需要存储的路径*/

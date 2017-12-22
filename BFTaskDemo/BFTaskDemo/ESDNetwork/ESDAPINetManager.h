@@ -11,6 +11,21 @@
 #import "ESDAPIResponse.h"
 #import "ZANetworking.h"
 
+/** 用法
+ TestRequest *request = [[TestRequest alloc] init];
+ request.retryCount = 0; //失败重发请求次数
+ request.delegate = self; //设置网络回调代理
+ 
+ [[ESDAPINetManager sharedInstance] taskWithRequest:request progress:^(NSProgress *downloadProgress) {
+ 
+ } success:^(ESDAPIResponse *apiResponse) {
+ 
+ } failure:^(ESDAPIResponse *apiResponse) {
+ 
+ }];
+ */
+
+
 typedef void(^APINetProgress)(NSProgress *downloadProgress);
 
 @protocol ESDAPINetManagerDelegate <NSObject>

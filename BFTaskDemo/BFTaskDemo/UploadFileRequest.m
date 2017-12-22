@@ -16,5 +16,9 @@
     return [ESDFileConfig new];
 }
 
-
+- (void)upload
+{
+//    data = zip(file);
+//    upload(data);
+}
 @end
