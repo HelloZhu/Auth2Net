@@ -22,10 +22,21 @@
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    ESDRequest *request = [[ESDRequest allocWithZone:zone] init];
+    request.delegate = self.delegate;
+    request.retryCount = self.retryCount;
+    return request;
+}
+
 - (void)dealloc
 {
     _delegate = nil;
 }
+
+
+
 
 - (NSString *)baseUrl
 {

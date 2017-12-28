@@ -27,7 +27,7 @@ typedef NS_ENUM(NSInteger , AuthTokenType){
     AuthTokenType_Password
 };
 
-@interface ESDRequest : NSObject
+@interface ESDRequest : NSObject<NSCopying>
 
 //该Request的请求结果响应代理
 @property (nonatomic , weak) id<ESDAPINetManagerDelegate> delegate;

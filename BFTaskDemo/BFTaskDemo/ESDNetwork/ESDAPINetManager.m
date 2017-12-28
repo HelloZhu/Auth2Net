@@ -16,11 +16,14 @@
 
 #define ESD_BLOCK_SAFE_RUN(block, ...)    block ? block(__VA_ARGS__) : nil;
 
+
 typedef NS_ENUM(NSInteger, FetchTokenType) {
     FetchClientToken = 0,
     FetchPWDToken,
     RefreshToken,
 };
+
+static NSInteger ErrorCode_NullRefreshToken = -1001;
 
 
 @interface ESDAPINetManager ()
@@ -243,7 +246,7 @@ typedef NS_ENUM(NSInteger, FetchTokenType) {
             }];
         }else if (type == RefreshToken) {
             if (!credential.refreshToken) {
-                NSError *refreshTokenError = [NSError errorWithDomain:NSCocoaErrorDomain code:-200 userInfo:@{NSLocalizedDescriptionKey:@"refreshToken is null"}];
+                NSError *refreshTokenError = [NSError errorWithDomain:NSCocoaErrorDomain code:ErrorCode_NullRefreshToken userInfo:@{NSLocalizedDescriptionKey:@"refreshToken is null"}];
                 [self.tokenCS setError:refreshTokenError];
                 return;
             }
