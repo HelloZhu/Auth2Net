@@ -131,7 +131,11 @@ static NSInteger ErrorCode_NullRefreshToken = -1001;
     NSDictionary *parameters = [request requestArgument];
     NSString *baseURLString = [request baseUrl];
     NSString *URLString = [request requestUrl];
-    URLString = [NSString stringWithFormat:@"%@%@",baseURLString, URLString];
+    if (URLString) {
+        URLString = [NSString stringWithFormat:@"%@%@",baseURLString, URLString];
+    }else{
+        URLString = baseURLString;
+    }
     
     NSMutableDictionary *allHeaderFileds = [NSMutableDictionary dictionary];
     NSDictionary *httpHeader = [request HttpHeaderArgument];

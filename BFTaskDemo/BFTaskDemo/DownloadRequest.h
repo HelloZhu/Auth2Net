@@ -10,4 +10,7 @@
 
 @interface DownloadRequest : ESDRequest
 @property (nonatomic, strong) NSArray *downloadFileIDs;
+
++ (void)downloadWithRequest:(DownloadRequest *)request success:(void(^)(NSArray *results))success failure:(void(^)(ESDAPIResponse *apiResponse))failure;
+
 @end

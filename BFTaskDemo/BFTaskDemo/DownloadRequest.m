@@ -11,8 +11,6 @@
 
 @interface DownloadRequest ()
 
-
-
 @end
 
 @implementation DownloadRequest
@@ -47,6 +45,11 @@
 {
     NSArray *localPaths = nil;
     NSArray *shouldDownloadfileIDs = nil;
+    
+    if (!shouldDownloadfileIDs.count) {
+        success(localPaths);
+        return;
+    }
     
     [[ESDAPINetManager sharedInstance] taskWithRequest:request progress:nil success:^(ESDAPIResponse *apiResponse) {
         
